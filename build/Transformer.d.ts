@@ -1,5 +1,5 @@
 import * as Immutable from "immutable";
-import { GenericEventListener } from "./EventDelegate";
+import { GenericEventListener } from "event-delegate";
 export declare type ImmutablePath = (string | number)[];
 export default abstract class Transformer<D extends Immutable.Map<string, any>> {
     private data;
@@ -17,8 +17,11 @@ export default abstract class Transformer<D extends Immutable.Map<string, any>> 
     protected concatBefore<T>(path: ImmutablePath, ...items: T[]): void;
     protected pushData<T>(path: ImmutablePath, ...items: T[]): void;
     protected unshiftData<T>(path: ImmutablePath, ...items: T[]): void;
-    protected insertDataAtIndex<T>(path: ImmutablePath, data: T): void;
+    protected insertDataAtIndex<T>(path: ImmutablePath, index: number, data: T): void;
     protected setDataIn(path: ImmutablePath, value: any): void;
+    protected deleteDataIn(path: ImmutablePath): void;
+    protected spliceDataIn<T>(path: ImmutablePath, index: number, count: number, ...values: T[]): void;
+    protected moveEntryInList(path: ImmutablePath, fromIndex: number, toIndex: number): void;
     private triggerDataChanged();
     private getListAtPath<T>(path);
 }

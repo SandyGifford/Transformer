@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Immutable = require("immutable");
-var EventDelegate_1 = require("./EventDelegate");
+var event_delegate_1 = require("event-delegate");
 var Transformer = (function () {
     function Transformer(data, transfoermerKey) {
         var _this = this;
         this.data = data;
         this.transfoermerKey = transfoermerKey;
-        this.eventDelegate = new EventDelegate_1.default();
+        this.eventDelegate = new event_delegate_1.default();
         this.batchUpdateStackSize = 0;
         this.addDataChangedListener = function (listener) {
             _this.eventDelegate.addEventListener(listener);
@@ -73,18 +73,40 @@ var Transformer = (function () {
         var list = this.getListAtPath(path);
         this.setDataIn(path, list.unshift.apply(list, items));
     };
-    Transformer.prototype.insertDataAtIndex = function (path, data) {
-        var basePath = path.slice(0, path.length - 1);
-        var list = this.getListAtPath(basePath);
-        var index = path[path.length - 1];
-        if (typeof index === "number")
-            this.setDataIn(basePath, list.insert(index, data));
-        else
-            throw "Last entry in path must be a number";
+    Transformer.prototype.insertDataAtIndex = function (path, index, data) {
+        var list = this.getListAtPath(path);
+        this.setDataIn(path, list.insert(index, data));
     };
     Transformer.prototype.setDataIn = function (path, value) {
         this.data = this.data.setIn(path, Immutable.fromJS(value));
         this.triggerDataChanged();
+    };
+    Transformer.prototype.deleteDataIn = function (path) {
+        var basePath = path.slice(0, path.length - 1);
+        var baseObject = this.data.getIn(basePath);
+        if (Immutable.List.isList(baseObject)) {
+            var index = path[path.length - 1];
+            this.setDataIn(basePath, baseObject.splice(index, 1));
+        }
+        else {
+            this.data = this.data.deleteIn(path);
+            this.triggerDataChanged();
+        }
+    };
+    Transformer.prototype.spliceDataIn = function (path, index, count) {
+        var values = [];
+        for (var _i = 3; _i < arguments.length; _i++) {
+            values[_i - 3] = arguments[_i];
+        }
+        var list = this.getListAtPath(path);
+        this.setDataIn(path, list.splice.apply(list, [index, count].concat(values)));
+        this.triggerDataChanged();
+    };
+    Transformer.prototype.moveEntryInList = function (path, fromIndex, toIndex) {
+        var list = this.getListAtPath(path);
+        var entry = list.get(fromIndex);
+        list = list.splice(fromIndex, 1);
+        this.setDataIn(path, list.insert(toIndex, entry));
     };
     Transformer.prototype.triggerDataChanged = function () {
         if (this.batchUpdateStackSize === 0)
