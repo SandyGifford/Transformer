@@ -1,0 +1,35 @@
+{
+  "name": "transformer",
+  "version": "1.0.0",
+  "description": "",
+  "typings": "build/Transformer.d.ts",
+  "main": "build/Transformer.js",
+  "scripts": {
+    "clean": "rm -rf build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "npm run clean; tsc;"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "event-delegate": "git+https://github.com/SandyGifford/EventDelegate.git",
+    "immutable": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^22.1.4",
+    "jest": "^22.4.2",
+    "ts-jest": "^22.4.0",
+    "typescript": "^2.7.2"
+  },
+  "jest": {
+    "testRegex": ".*\\/__tests__\\/.*\\.test\\.(ts|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    }
+  }
+}
